@@ -19,6 +19,9 @@ public class JwtUtil {
     @Value("${app.jwt.expiration-ms}")
     private long jwtExpirationMs;
 
+    @Value("${app.jwt.refresh-expiration-ms}")
+    private long refreshExpirationMs;
+
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
@@ -34,6 +37,21 @@ public class JwtUtil {
         return Jwts.builder()
                 .subject(email)
                 .claim("rol", rol)
+                .issuedAt(ahora)
+                .expiration(expiracion)
+                .signWith(getSigningKey())
+                .compact();
+    }
+
+    /**
+     * Genera un refresh token (JWT) de mayor duración, sin claims adicionales.
+     */
+    public String generarRefreshToken(String email) {
+        Date ahora = new Date();
+        Date expiracion = new Date(ahora.getTime() + refreshExpirationMs);
+
+        return Jwts.builder()
+                .subject(email)
                 .issuedAt(ahora)
                 .expiration(expiracion)
                 .signWith(getSigningKey())

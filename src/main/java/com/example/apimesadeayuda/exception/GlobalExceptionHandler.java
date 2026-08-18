@@ -16,9 +16,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidacion(MethodArgumentNotValidException ex) {
         Map<String, String> errores = new LinkedHashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach(error ->
-                errores.put(error.getField(), error.getDefaultMessage())
-        );
+        ex.getBindingResult().getFieldErrors()
+                .forEach(error -> errores.put(error.getField(), error.getDefaultMessage()));
 
         return construirRespuesta(HttpStatus.BAD_REQUEST, "Datos inválidos", errores);
     }
@@ -30,6 +29,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CredencialesInvalidasException.class)
     public ResponseEntity<Map<String, Object>> handleCredencialesInvalidas(CredencialesInvalidasException ex) {
+        return construirRespuesta(HttpStatus.UNAUTHORIZED, ex.getMessage(), null);
+    }
+
+    @ExceptionHandler(RefreshTokenInvalidoException.class)
+    public ResponseEntity<Map<String, Object>> handleRefreshTokenInvalido(RefreshTokenInvalidoException ex) {
         return construirRespuesta(HttpStatus.UNAUTHORIZED, ex.getMessage(), null);
     }
 

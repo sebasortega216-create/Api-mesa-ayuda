@@ -25,6 +25,7 @@ public class SecurityConfig {
     private static final String[] RUTAS_PUBLICAS = {
             "/api/auth/registro",
             "/api/auth/login",
+            "/api/auth/refresh",
             "/api/ping",
             "/h2-console/**"
     };
