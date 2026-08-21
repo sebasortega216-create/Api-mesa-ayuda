@@ -59,6 +59,13 @@ public class AuthService {
         String accessToken = jwtUtil.generarAccessToken(usuario.getEmail(), usuario.getRol().name());
         String refreshTokenValor = jwtUtil.generarRefreshToken(usuario.getEmail());
 
+        System.out.println("=========================================");
+        System.out.println("EMAIL: " + usuario.getEmail());
+        System.out.println("ROL: " + usuario.getRol().name());
+        System.out.println("ACCESS TOKEN: " + accessToken);
+        System.out.println("REFRESH TOKEN: " + refreshTokenValor);
+        System.out.println("=========================================");
+
         RefreshToken refreshToken = RefreshToken.builder()
                 .token(refreshTokenValor)
                 .usuario(usuario)
@@ -67,7 +74,9 @@ public class AuthService {
                 .build();
         refreshTokenRepository.save(refreshToken);
 
-        return new AuthResponse(accessToken, refreshTokenValor, UsuarioResponse.desde(usuario));
+        AuthResponse response = new AuthResponse(accessToken, refreshTokenValor, UsuarioResponse.desde(usuario));
+        System.out.println("RESPUESTA: " + response);
+        return response;
     }
 
     @Transactional(readOnly = true)

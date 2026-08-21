@@ -5,6 +5,7 @@ import com.example.apimesadeayuda.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -21,7 +22,6 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-    // Rutas públicas: no requieren token.
     private static final String[] RUTAS_PUBLICAS = {
             "/api/auth/registro",
             "/api/auth/login",
@@ -43,6 +43,19 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(RUTAS_PUBLICAS).permitAll()
+
+                        // Rutas para SOPORTE y ADMIN
+                        .requestMatchers(HttpMethod.GET, "/api/tickets").hasAnyRole("SOPORTE", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/tickets/vencidos").hasAnyRole("SOPORTE", "ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/tickets/{id}/estado").hasAnyRole("SOPORTE", "ADMIN") // ←
+                                                                                                                      // CORREGIDO
+
+                        // Rutas para cualquier usuario autenticado
+                        .requestMatchers(HttpMethod.POST, "/api/tickets").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/tickets/mios").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/tickets/{id}").authenticated()
+                        .requestMatchers("/api/auth/logout").authenticated()
+
                         .anyRequest().authenticated())
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

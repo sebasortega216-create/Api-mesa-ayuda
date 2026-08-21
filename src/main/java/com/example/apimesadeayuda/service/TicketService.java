@@ -57,15 +57,16 @@ public class TicketService {
         return convertirAResponse(guardado);
     }
 
+    @Transactional // 
     public List<TicketResponse> getTicketsByUsuario(Long usuarioId) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
-
         return ticketRepository.findByCreadoPor(usuario).stream()
                 .map(this::convertirAResponse)
                 .collect(Collectors.toList());
     }
 
+    @Transactional // 
     public TicketResponse getTicketById(Long ticketId, Long usuarioId, Rol rol) {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Ticket no encontrado"));
